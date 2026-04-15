@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GT Field Collection Planner — India Crop Remote Sensing</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d1117;
+  --bg2: #161b22;
+  --bg3: #1c2330;
+  --border: rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.15);
+  --text: #e6edf3;
+  --text2: #8b949e;
+  --text3: #6e7681;
+  --green: #3fb950;
+  --green-dim: #1a3a22;
+  --green-mid: #238636;
+  --blue: #58a6ff;
+  --blue-dim: #1a2d4a;
+  --amber: #e3b341;
+  --amber-dim: #3a2c0e;
+  --red: #f85149;
+  --red-dim: #3a1a1a;
+  --teal: #39d353;
+  --accent: #f0883e;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Instrument Sans',sans-serif;font-size:14px;line-height:1.6;min-height:100vh}
+
+/* NAV */
+nav{background:rgba(13,17,23,0.92);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:52px;position:sticky;top:0;z-index:100;backdrop-filter:blur(8px)}
+.nav-brand{font-family:'Fraunces',serif;font-size:16px;font-weight:600;color:var(--green);letter-spacing:-0.3px}
+.nav-brand span{color:var(--text2);font-weight:300}
+.nav-links{display:flex;gap:1.5rem}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:13px;transition:color .2s}
+.nav-links a:hover{color:var(--text)}
+.nav-badge{background:var(--green-dim);color:var(--green);font-size:11px;padding:3px 8px;border-radius:12px;font-family:'DM Mono',monospace}
+
+/* HERO */
+.hero{padding:4rem 2rem 2.5rem;max-width:1100px;margin:0 auto}
+.hero-eyebrow{font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:1rem}
+.hero h1{font-family:'Fraunces',serif;font-size:clamp(28px,4vw,48px);font-weight:600;line-height:1.15;letter-spacing:-1px;margin-bottom:1rem;max-width:700px}
+.hero h1 em{font-style:italic;color:var(--green)}
+.hero-desc{color:var(--text2);max-width:560px;font-size:14px;line-height:1.8;margin-bottom:2rem}
+.hero-stats{display:flex;gap:2rem;flex-wrap:wrap}
+.stat{border-left:2px solid var(--green-mid);padding-left:1rem}
+.stat-val{font-family:'Fraunces',serif;font-size:24px;font-weight:600;color:var(--text)}
+.stat-label{font-size:11px;color:var(--text2);margin-top:2px}
+
+/* SECTION */
+.section{max-width:1100px;margin:0 auto;padding:2rem 2rem}
+.section-hd{font-family:'Fraunces',serif;font-size:20px;font-weight:600;margin-bottom:0.4rem;color:var(--text)}
+.section-sub{font-size:13px;color:var(--text2);margin-bottom:1.5rem}
+.divider{border:none;border-top:1px solid var(--border);margin:0}
+
+/* SEASON TOGGLE */
+.season-toggle{display:inline-flex;border:1px solid var(--border2);border-radius:8px;overflow:hidden;margin-bottom:1.5rem}
+.stab{padding:8px 24px;font-size:13px;cursor:pointer;border:none;background:transparent;color:var(--text2);font-family:'Instrument Sans',sans-serif;transition:all .2s}
+.stab.active{background:var(--green-mid);color:#fff}
+
+/* FILTER ROW */
+.filter-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:1.25rem;align-items:center}
+.filter-row label{font-size:12px;color:var(--text2)}
+select{background:var(--bg2);border:1px solid var(--border2);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px;font-family:'Instrument Sans',sans-serif;cursor:pointer}
+select:focus{outline:none;border-color:var(--green)}
+
+/* TABLE */
+.table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead{background:var(--bg3)}
+th{padding:10px 12px;text-align:left;font-size:11px;font-weight:500;color:var(--text2);letter-spacing:0.5px;text-transform:uppercase;white-space:nowrap;border-bottom:1px solid var(--border)}
+td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,0.02)}
+.state-name{font-weight:600;font-size:13px;color:var(--text)}
+.crop-list{color:var(--text2);font-size:11px;line-height:1.6;max-width:160px}
+.window-text{font-family:'DM Mono',monospace;font-size:12px;color:var(--green)}
+.s2-dates{font-family:'DM Mono',monospace;font-size:11px;color:var(--blue)}
+.s2-passes{font-size:11px;color:var(--text3);margin-top:2px}
+.zone-tag{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:0.3px;text-transform:uppercase}
+.zone-north{background:rgba(88,166,255,0.12);color:#79c0ff}
+.zone-south{background:rgba(63,185,80,0.12);color:#56d364}
+.zone-east{background:rgba(227,179,65,0.12);color:#e3b341}
+.zone-west{background:rgba(240,136,62,0.12);color:#f0883e}
+.zone-central{background:rgba(188,140,255,0.12);color:#bc8cff}
+.zone-hilly{background:rgba(255,255,255,0.08);color:#8b949e}
+
+/* BADGES */
+.badge{display:inline-block;padding:3px 8px;border-radius:12px;font-size:11px;font-weight:600}
+.badge-best{background:var(--green-dim);color:var(--green)}
+.badge-good{background:var(--blue-dim);color:var(--blue)}
+.badge-med{background:var(--amber-dim);color:var(--amber)}
+.cloud-hi{color:var(--red)}
+.cloud-mid{color:var(--amber)}
+.cloud-lo{color:var(--green)}
+
+/* CALENDAR BAR */
+.cal-bar{display:flex;height:18px;border-radius:4px;overflow:hidden;width:180px}
+.cal-seg{flex:1;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700}
+.cal-labels{display:flex;width:180px;justify-content:space-between;margin-top:2px}
+.cal-labels span{font-size:8px;color:var(--text3);flex:1;text-align:center}
+
+/* SUMMARY CARDS */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:2rem}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.1rem 1.25rem}
+.card-label{font-size:11px;color:var(--text2);margin-bottom:6px;letter-spacing:0.3px;text-transform:uppercase}
+.card-val{font-family:'Fraunces',serif;font-size:22px;font-weight:600;color:var(--text);line-height:1}
+.card-sub{font-size:11px;color:var(--text3);margin-top:4px}
+.card-green .card-val{color:var(--green)}
+.card-blue .card-val{color:var(--blue)}
+.card-amber .card-val{color:var(--amber)}
+
+/* PROTOCOL SECTION */
+.protocol-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-bottom:2rem}
+.proto-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.1rem 1.25rem}
+.proto-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;font-size:14px}
+.proto-card h3{font-size:13px;font-weight:600;margin-bottom:6px;color:var(--text)}
+.proto-card p{font-size:12px;color:var(--text2);line-height:1.7}
+
+/* CLUSTER TABLE */
+.cluster-table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px;margin-bottom:2rem}
+.cluster-td-states{font-size:11px;color:var(--text2);line-height:1.8;max-width:200px}
+
+/* MISTAKES */
+.mistake-row td:first-child{color:var(--red);font-size:12px}
+.mistake-row td:nth-child(2){color:var(--text2);font-size:12px}
+.mistake-row td:nth-child(3){color:var(--green);font-size:12px}
+
+/* S2 PHASE BAR */
+.phase-section{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.25rem;margin-bottom:2rem}
+.phase-hd{font-size:13px;font-weight:600;margin-bottom:1rem;color:var(--text)}
+.phase-bar-wrap{display:flex;gap:4px;margin-bottom:8px}
+.phase-blk{flex:1;height:36px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;text-align:center;line-height:1.3}
+.phase-labels{display:flex;gap:4px;margin-bottom:4px}
+.phase-labels span{flex:1;text-align:center;font-size:9px;color:var(--text3)}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:2rem;text-align:center;color:var(--text3);font-size:12px;margin-top:1rem}
+footer span{color:var(--text2)}
+
+/* HIGHLIGHT ROW */
+tr.highlight-row td{background:rgba(63,185,80,0.04)}
+
+/* SEARCH */
+.search-wrap{position:relative;flex:1;max-width:220px}
+.search-wrap input{width:100%;background:var(--bg2);border:1px solid var(--border2);color:var(--text);padding:6px 10px 6px 30px;border-radius:6px;font-size:12px;font-family:'Instrument Sans',sans-serif}
+.search-wrap input:focus{outline:none;border-color:var(--green)}
+.search-icon{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:12px}
+
+@media(max-width:680px){
+  .hero h1{font-size:26px}
+  .nav-links{display:none}
+  .hero-stats{gap:1.25rem}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">GT<span>•</span>Planner <span style="font-size:12px;font-weight:300;color:var(--text3)">/ India Crop RS</span></div>
+  <div class="nav-links">
+    <a href="#planner">State Planner</a>
+    <a href="#clusters">Team Clusters</a>
+    <a href="#protocol">Protocol</a>
+    <a href="#mistakes">Common Mistakes</a>
+  </div>
+  <span class="nav-badge">Sentinel-2 · 20 States</span>
+</nav>
+
+<div class="hero">
+  <div class="hero-eyebrow">Agricultural Remote Sensing · Ground Truth</div>
+  <h1>Field collection timing for <em>Kharif & Rabi</em> crop identification</h1>
+  <p class="hero-desc">Sentinel-2 aligned GT mission planner for 20 major agricultural states of India. Optimized for single-visit campaigns with a 1–45 day field window per season.</p>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-val">20</div><div class="stat-label">States covered</div></div>
+    <div class="stat"><div class="stat-val">5-day</div><div class="stat-label">S2 revisit (A+B)</div></div>
+    <div class="stat"><div class="stat-val">Aug 15</div><div class="stat-label">Kharif GT opens</div></div>
+    <div class="stat"><div class="stat-val">Jan 10</div><div class="stat-label">Rabi GT opens</div></div>
+    <div class="stat"><div class="stat-val">45 days</div><div class="stat-label">Max field window</div></div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- PLANNER SECTION -->
+<div class="section" id="planner">
+  <div class="section-hd">State-wise GT mission planner</div>
+  <div class="section-sub">Optimal field visit windows aligned with Sentinel-2 acquisition schedule and crop growth stages</div>
+
+  <div class="cards">
+    <div class="card card-green">
+      <div class="card-label">Kharif best window</div>
+      <div class="card-val">Aug 15 – Sep 15</div>
+      <div class="card-sub">Peak vegetative / early reproductive</div>
+    </div>
+    <div class="card card-blue">
+      <div class="card-label">Rabi best window</div>
+      <div class="card-val">Jan 10 – Feb 10</div>
+      <div class="card-sub">Max canopy, pre-senescence</div>
+    </div>
+    <div class="card card-amber">
+      <div class="card-label">S2 usable passes (Kharif)</div>
+      <div class="card-val">~5–7</div>
+      <div class="card-sub">Monsoon cloud limits; SAR gap-fill advised</div>
+    </div>
+    <div class="card">
+      <div class="card-label">S2 usable passes (Rabi)</div>
+      <div class="card-val" style="color:var(--blue)">~8–9</div>
+      <div class="card-sub">Clear sky season; ideal alignment</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Min GT points per crop/zone</div>
+      <div class="card-val">30–50</div>
+      <div class="card-sub">Pure-crop polygons or GPS points</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Pixel buffer (S2 10m)</div>
+      <div class="card-val">&gt;30m</div>
+      <div class="card-sub">Min 3×3 px pure area per GT point</div>
+    </div>
+  </div>
+
+  <div class="filter-row">
+    <div class="season-toggle">
+      <button class="stab active" id="btn-kharif" onclick="setSeason('kharif')">Kharif (Jun–Nov)</button>
+      <button class="stab" id="btn-rabi" onclick="setSeason('rabi')">Rabi (Oct–Apr)</button>
+    </div>
+    <label>Zone:</label>
+    <select id="zoneFilter" onchange="renderTable()">
+      <option value="all">All zones</option>
+      <option value="north">North</option>
+      <option value="central">Central</option>
+      <option value="west">West</option>
+      <option value="south">South</option>
+      <option value="east">East</option>
+      <option value="hilly">Hilly / J&K</option>
+    </select>
+    <label>Cloud risk:</label>
+    <select id="cloudFilter" onchange="renderTable()">
+      <option value="all">All</option>
+      <option value="low">Low only</option>
+      <option value="medium">Low + Medium</option>
+      <option value="high">High only</option>
+    </select>
+    <div class="search-wrap">
+      <span class="search-icon">&#128269;</span>
+      <input type="text" id="searchInput" placeholder="Search state or crop..." oninput="renderTable()">
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>State</th>
+          <th>Zone</th>
+          <th>Major crops</th>
+          <th>Optimal GT window</th>
+          <th>S2 mission window</th>
+          <th>~S2 passes</th>
+          <th>Cloud risk</th>
+          <th>Priority</th>
+          <th>Season calendar</th>
+        </tr>
+      </thead>
+      <tbody id="mainTbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- SENTINEL-2 PHASE -->
+<div class="section">
+  <div class="section-hd">Sentinel-2 field sync strategy</div>
+  <div class="section-sub">How to align your 45-day field campaign with S2 acquisition windows</div>
+
+  <div class="phase-section">
+    <div class="phase-hd">Kharif — recommended 45-day deployment phases</div>
+    <div class="phase-labels">
+      <span>Jul 25</span><span>Aug 4</span><span>Aug 14</span><span>Aug 24</span><span>Sep 3</span><span>Sep 13</span><span>Sep 23</span><span>Oct 3</span><span>Oct 8</span>
+    </div>
+    <div class="phase-bar-wrap">
+      <div class="phase-blk" style="background:#1a3a22;color:#56d364;flex:1">Pre-survey<br>recon</div>
+      <div class="phase-blk" style="background:#238636;color:#fff;flex:2">PHASE 1<br>North + West</div>
+      <div class="phase-blk" style="background:#3fb950;color:#0d1117;flex:2">PHASE 2<br>Central + East</div>
+      <div class="phase-blk" style="background:#56d364;color:#0d1117;flex:2">PHASE 3<br>South + NE</div>
+      <div class="phase-blk" style="background:#1a3a22;color:#56d364;flex:1">QC &amp;<br>gap-fill</div>
+    </div>
+    <p style="font-size:11px;color:var(--text3);margin-top:6px">Plan field visits 0–2 days AFTER a confirmed cloud-free S2 pass. Use Copernicus Browser or GEE Sentinel Hub to verify tile status before mobilizing teams.</p>
+  </div>
+
+  <div class="phase-section">
+    <div class="phase-hd">Rabi — recommended 45-day deployment phases</div>
+    <div class="phase-labels">
+      <span>Dec 18</span><span>Jan 2</span><span>Jan 12</span><span>Jan 22</span><span>Feb 1</span><span>Feb 11</span><span>Feb 21</span><span>Mar 1</span>
+    </div>
+    <div class="phase-bar-wrap">
+      <div class="phase-blk" style="background:#0d2644;color:#79c0ff;flex:1">NE + WB<br>early</div>
+      <div class="phase-blk" style="background:#185fa5;color:#fff;flex:2">PHASE 1<br>North + West</div>
+      <div class="phase-blk" style="background:#388bfd;color:#fff;flex:2">PHASE 2<br>Central + East</div>
+      <div class="phase-blk" style="background:#58a6ff;color:#0d1117;flex:2">PHASE 3<br>South states</div>
+      <div class="phase-blk" style="background:#0d2644;color:#79c0ff;flex:1">Validation<br>pass</div>
+    </div>
+    <p style="font-size:11px;color:var(--text3);margin-top:6px">Rabi is ideal — most states have &lt;20% cloud cover in Jan–Feb. Mustard flowering (golden flush) in late Jan is the most spectrally unique signature; prioritize that window for Punjab, Haryana, Rajasthan, UP, MP.</p>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- TEAM CLUSTERS -->
+<div class="section" id="clusters">
+  <div class="section-hd">Team deployment clusters</div>
+  <div class="section-sub">Recommended state groupings for efficient field team mobilization</div>
+
+  <div class="cluster-table-wrap">
+    <table>
+      <thead>
+        <tr><th>Cluster</th><th>States</th><th>Kharif window</th><th>Rabi window</th><th>Travel hub</th><th>Cloud challenge</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="zone-tag zone-north">North</span></td>
+          <td class="cluster-td-states">Punjab · Haryana · HP · J&K · Uttarakhand · UP</td>
+          <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--green)">Aug 20 – Sep 25</td>
+          <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--blue)">Jan 10 – Feb 15</td>
+          <td style="font-size:12px;color:var(--text2)">Chandigarh / Delhi</td>
+          <td><span class="badge badge-good">Low</span></td>
+        </tr>
+        <tr>
+          <td><span class="zone-tag zone-central">Central</span></td>
+          <td class="cluster-td-states">MP · Chhattisgarh · Rajasthan</td>
+          <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--green)">Aug 15 – Sep 20</td>
+          <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--blue)">Jan 10 – Feb 15</td>
+          <td style="font-size:12px;color:var(--text2)">Bhopal / Indore</td>
+          <td><span class="badge badge-med">Medium</span></td>
+        </tr>
+        <tr>
+          <td><span class="zone-tag zone-west">West</span></td>
+          <td class="cluster-td-states">Gujarat · Maharashtra</td>
+          <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--green)">Aug 10 – Sep 15</td>
+          <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--blue)">Jan 5 – Feb 10</td>
+          <td style="font-size:12px;color:var(--text2)">Ahmedabad / Pune</td>
+          <td><span class="badge badge-med">Medium</span></td>
+        </tr>
+        <tr>
+          <td><span class="zone-tag zone-south">South</span></td>
+          <td class="cluster-td-states">Andhra Pradesh · Telangana · Karnataka · Tamil Nadu</td>
+          <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--green)">Aug 20 – Sep 30</td>
+          <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--blue)">Jan 15 – Feb 20</td>
+          <td style="font-size:12px;color:var(--text2)">Hyderabad / Bangalore</td>
+          <td><span class="badge badge-med">Medium</span></td>
+        </tr>
+        <tr>
+          <td><span class="zone-tag zone-east">East</span></td>
+          <td class="cluster-td-states">Bihar · Jharkhand · Odisha · West Bengal</td>
+          <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--green)">Aug 10 – Sep 15</td>
+          <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--blue)">Jan 5 – Feb 10</td>
+          <td style="font-size:12px;color:var(--text2)">Patna / Bhubaneswar</td>
+          <td><span class="badge" style="background:var(--red-dim);color:var(--red)">High</span></td>
+        </tr>
+        <tr>
+          <td><span class="zone-tag zone-hilly">Hilly/NE</span></td>
+          <td class="cluster-td-states">Assam · HP · J&K · Uttarakhand</td>
+          <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--green)">Aug 1 – Sep 10</td>
+          <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--blue)">Dec 20 – Jan 25</td>
+          <td style="font-size:12px;color:var(--text2)">Guwahati / Shimla</td>
+          <td><span class="badge badge-med">Medium</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- PROTOCOL -->
+<div class="section" id="protocol">
+  <div class="section-hd">GT field collection protocol</div>
+  <div class="section-sub">Standard operating guidelines for field teams — Sentinel-2 10m bands</div>
+
+  <div class="protocol-grid">
+    <div class="proto-card">
+      <div class="proto-icon" style="background:rgba(63,185,80,0.15);color:var(--green)">&#9670;</div>
+      <h3>Minimum sample size</h3>
+      <p>Per crop per agro-climatic zone: ≥30 pure-crop polygons or ≥50 GPS points. For rare crops (millets, specialty pulses) ≥20 is acceptable. Ensure spatial distribution across soil types and irrigation classes (rainfed vs. irrigated).</p>
+    </div>
+    <div class="proto-card">
+      <div class="proto-icon" style="background:rgba(88,166,255,0.15);color:var(--blue)">&#9632;</div>
+      <h3>Polygon vs. point collection</h3>
+      <p>Collect field boundary polygons, not just centroids. For fields &lt;0.5 ha collect center-point + area estimate. For fields &gt;1 ha walk the boundary with a smartphone GPS or handheld GNSS. Each GT point must represent a pure 3×3 pixel (30m×30m) area — maintain &gt;30m buffer from field edge for S2 10m bands.</p>
+    </div>
+    <div class="proto-card">
+      <div class="proto-icon" style="background:rgba(227,179,65,0.15);color:var(--amber)">&#9650;</div>
+      <h3>Mandatory attributes</h3>
+      <p>Crop name (local + botanical), variety if known, sowing date (approximate), irrigation type (rainfed / canal / borewell / drip), growth stage at visit time, intercrop or mixed crop status, field size estimate, and a geotagged photograph.</p>
+    </div>
+    <div class="proto-card">
+      <div class="proto-icon" style="background:rgba(188,140,255,0.15);color:#bc8cff)">&#9679;</div>
+      <h3>Satellite pass sync</h3>
+      <p>Plan field visits 0–2 days AFTER a confirmed cloud-free S2 pass. Check 7-day weather forecast before mobilizing. For Kharif, identify 2–3 alternate S2 acquisition dates within your 45-day window as monsoon backup. SAR (Sentinel-1) can fill cloud gaps.</p>
+    </div>
+    <div class="proto-card">
+      <div class="proto-icon" style="background:rgba(240,136,62,0.15);color:var(--accent)">&#9670;</div>
+      <h3>Mixed crop handling</h3>
+      <p>Flag all mixed-crop and intercrop fields with a "MIXED" tag. Exclude from primary training set unless building a mixed-crop class. Record the dominant + secondary crop combination for potential mixed-class use.</p>
+    </div>
+    <div class="proto-card">
+      <div class="proto-icon" style="background:rgba(63,185,80,0.1);color:var(--green)">&#9632;</div>
+      <h3>Spatial sampling strategy</h3>
+      <p>Never sample roadside fields only — this creates systematic bias toward irrigated, accessible plots. Use a stratified random sampling grid for site selection. Cover all tehsils in the target district, not just accessible talukas.</p>
+    </div>
+    <div class="proto-card">
+      <div class="proto-icon" style="background:rgba(88,166,255,0.1);color:var(--blue)">&#9679;</div>
+      <h3>Crop code standardization</h3>
+      <p>All teams must use the same standardized crop code list + local name lookup table before departure. Single enumerator naming leads to duplicates (e.g. "Dhan" vs "Paddy" vs "Rice"). Use FASAL or ICAR crop codes as reference.</p>
+    </div>
+    <div class="proto-card">
+      <div class="proto-icon" style="background:rgba(240,136,62,0.1);color:var(--accent)">&#9650;</div>
+      <h3>Quality control in field</h3>
+      <p>Each GT point must have: (1) geotagged photo, (2) crop verified by local farmer if possible, (3) NDVI visual check — avoid fields with NDVI &lt;0.3 (sparse/stressed canopy, poor spectral quality). Flag any field narrower than 50m as "edge risk" for S2.</p>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- COMMON MISTAKES -->
+<div class="section" id="mistakes">
+  <div class="section-hd">Common GT mistakes and mitigation</div>
+  <div class="section-sub">Avoid these pitfalls to maintain training data quality</div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Mistake</th><th>Impact on classification</th><th>Fix</th></tr>
+      </thead>
+      <tbody>
+        <tr class="mistake-row">
+          <td>Visiting too early — July for Kharif</td>
+          <td>Bare soil signal dominates; poor spectral separability; NDVI &lt;0.3</td>
+          <td>Wait for canopy closure. Check NDVI &gt;0.5 in field before collecting points</td>
+        </tr>
+        <tr class="mistake-row">
+          <td>Visiting during harvest — Oct for Kharif</td>
+          <td>Crop already cut; GT points represent stubble/bare soil not crop</td>
+          <td>Check local harvest calendar before scheduling. Visit before 70% of area is harvested</td>
+        </tr>
+        <tr class="mistake-row">
+          <td>Roadside / accessible field bias</td>
+          <td>Irrigated, high-input fields over-represented; classifier fails on rainfed areas</td>
+          <td>Use systematic random sampling grid. Cover all land-use gradients and soil types</td>
+        </tr>
+        <tr class="mistake-row">
+          <td>No photograph documentation</td>
+          <td>GT quality unverifiable during post-processing and QC review</td>
+          <td>Mandatory geotagged photo for every GT point. Store in same folder as GPS data</td>
+        </tr>
+        <tr class="mistake-row">
+          <td>Ignoring mixed crops / intercropping</td>
+          <td>Mixed pixels corrupt classifier training; spectral confusion between classes</td>
+          <td>Flag and exclude from primary training set OR create dedicated "mixed" class</td>
+        </tr>
+        <tr class="mistake-row">
+          <td>Inconsistent crop naming across teams</td>
+          <td>Duplicate classes in training data; breaks label encoder in ML pipeline</td>
+          <td>Standardize to crop code list + local name lookup table before field departure</td>
+        </tr>
+        <tr class="mistake-row">
+          <td>GPS points too close to field edge</td>
+          <td>Edge pixels mix crop spectral signature with bunds, roads, water channels</td>
+          <td>Maintain &gt;30m buffer from field edge for all S2 GT points (3 pixel minimum)</td>
+        </tr>
+        <tr class="mistake-row">
+          <td>Over-sampling dominant crops (paddy, wheat)</td>
+          <td>Class imbalance; minority crops (pulses, oilseeds) poorly classified</td>
+          <td>Set per-crop quotas. Allocate extra effort to minority crops even if harder to find</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<footer>
+  <p>GT Field Collection Planner · India Crop Remote Sensing · Sentinel-2 Aligned</p>
+  <p style="margin-top:6px">Kharif window: <span>Aug 15 – Sep 30</span> · Rabi window: <span>Jan 10 – Feb 20</span> · 20 states · 5-day S2 revisit · 45-day max campaign</p>
+</footer>
+
+<script>
+const DATA = {
+  kharif: [
+    {state:"Andhra Pradesh",zone:"south",crops:"Paddy, Cotton, Maize, Groundnut",window:"Aug 20 – Sep 25",s2s:"Aug 18",s2e:"Oct 2",cloud:"medium",priority:"High",cal:[0,0,1,2,2,1,0,0,0,0,0,0]},
+    {state:"Assam",zone:"north",crops:"Sali paddy, Jute, Maize",window:"Aug 1 – Sep 10",s2s:"Jul 30",s2e:"Sep 14",cloud:"high",priority:"High",cal:[0,1,2,2,1,0,0,0,0,0,0,0]},
+    {state:"Bihar",zone:"east",crops:"Paddy, Maize, Jute",window:"Aug 10 – Sep 15",s2s:"Aug 8",s2e:"Sep 22",cloud:"high",priority:"High",cal:[0,0,1,2,2,1,0,0,0,0,0,0]},
+    {state:"Chhattisgarh",zone:"central",crops:"Paddy",window:"Aug 15 – Sep 20",s2s:"Aug 13",s2e:"Sep 27",cloud:"high",priority:"High",cal:[0,0,1,2,2,1,0,0,0,0,0,0]},
+    {state:"Gujarat",zone:"west",crops:"Cotton, Groundnut, Bajra, Castor",window:"Aug 10 – Sep 10",s2s:"Aug 8",s2e:"Sep 22",cloud:"medium",priority:"High",cal:[0,0,1,2,2,0,0,0,0,0,0,0]},
+    {state:"Haryana",zone:"north",crops:"Paddy, Cotton, Bajra, Maize",window:"Aug 20 – Sep 15",s2s:"Aug 18",s2e:"Sep 29",cloud:"low",priority:"High",cal:[0,0,1,2,2,0,0,0,0,0,0,0]},
+    {state:"Himachal Pradesh",zone:"hilly",crops:"Maize, Paddy (hilly), Potato",window:"Aug 15 – Sep 15",s2s:"Aug 13",s2e:"Sep 27",cloud:"medium",priority:"Medium",cal:[0,0,1,2,2,0,0,0,0,0,0,0]},
+    {state:"Jammu & Kashmir",zone:"hilly",crops:"Paddy (Kashmir valley), Maize",window:"Aug 10 – Sep 10",s2s:"Aug 8",s2e:"Sep 22",cloud:"medium",priority:"Medium",cal:[0,0,1,2,1,0,0,0,0,0,0,0]},
+    {state:"Jharkhand",zone:"east",crops:"Paddy, Maize, Pulses",window:"Aug 15 – Sep 15",s2s:"Aug 13",s2e:"Sep 27",cloud:"high",priority:"High",cal:[0,0,1,2,2,0,0,0,0,0,0,0]},
+    {state:"Karnataka",zone:"south",crops:"Paddy, Jowar, Cotton, Maize, Groundnut",window:"Aug 20 – Sep 25",s2s:"Aug 18",s2e:"Oct 2",cloud:"medium",priority:"High",cal:[0,0,1,2,2,1,0,0,0,0,0,0]},
+    {state:"Madhya Pradesh",zone:"central",crops:"Soybean, Paddy, Maize, Cotton",window:"Aug 10 – Sep 15",s2s:"Aug 8",s2e:"Sep 22",cloud:"medium",priority:"High",cal:[0,0,1,2,2,0,0,0,0,0,0,0]},
+    {state:"Maharashtra",zone:"west",crops:"Soybean, Cotton, Paddy, Sugarcane",window:"Aug 15 – Sep 15",s2s:"Aug 13",s2e:"Sep 27",cloud:"medium",priority:"High",cal:[0,0,1,2,2,0,0,0,0,0,0,0]},
+    {state:"Odisha",zone:"east",crops:"Paddy (Kharif), Maize",window:"Aug 20 – Sep 20",s2s:"Aug 18",s2e:"Oct 3",cloud:"high",priority:"High",cal:[0,0,1,2,2,1,0,0,0,0,0,0]},
+    {state:"Punjab",zone:"north",crops:"Paddy, Maize",window:"Aug 20 – Sep 10",s2s:"Aug 18",s2e:"Sep 24",cloud:"low",priority:"High",cal:[0,0,1,2,2,0,0,0,0,0,0,0]},
+    {state:"Rajasthan",zone:"central",crops:"Bajra, Jowar, Groundnut, Moth bean",window:"Aug 20 – Sep 20",s2s:"Aug 18",s2e:"Oct 3",cloud:"low",priority:"High",cal:[0,0,1,2,2,1,0,0,0,0,0,0]},
+    {state:"Tamil Nadu",zone:"south",crops:"Samba paddy, Cotton, Groundnut",window:"Sep 1 – Oct 5",s2s:"Aug 30",s2e:"Oct 13",cloud:"medium",priority:"High",cal:[0,0,0,1,2,2,1,0,0,0,0,0]},
+    {state:"Telangana",zone:"south",crops:"Paddy, Cotton, Maize, Soybean",window:"Aug 20 – Sep 25",s2s:"Aug 18",s2e:"Oct 2",cloud:"medium",priority:"High",cal:[0,0,1,2,2,1,0,0,0,0,0,0]},
+    {state:"Uttar Pradesh",zone:"north",crops:"Paddy, Sugarcane, Maize, Arhar",window:"Aug 15 – Sep 20",s2s:"Aug 13",s2e:"Sep 27",cloud:"medium",priority:"High",cal:[0,0,1,2,2,1,0,0,0,0,0,0]},
+    {state:"Uttarakhand",zone:"hilly",crops:"Paddy (hilly), Maize, Soybean",window:"Aug 15 – Sep 10",s2s:"Aug 13",s2e:"Sep 24",cloud:"medium",priority:"Medium",cal:[0,0,1,2,1,0,0,0,0,0,0,0]},
+    {state:"West Bengal",zone:"east",crops:"Aman paddy, Jute, Maize",window:"Aug 20 – Sep 20",s2s:"Aug 18",s2e:"Oct 3",cloud:"high",priority:"High",cal:[0,0,1,2,2,1,0,0,0,0,0,0]}
+  ],
+  rabi: [
+    {state:"Andhra Pradesh",zone:"south",crops:"Rabi paddy, Groundnut, Sunflower, Pulses",window:"Jan 15 – Feb 20",s2s:"Jan 13",s2e:"Feb 27",cloud:"low",priority:"High",cal:[0,0,0,0,0,0,0,0,0,0,2,2]},
+    {state:"Assam",zone:"north",crops:"Mustard, Rabi pulses, Potato",window:"Dec 20 – Jan 25",s2s:"Dec 18",s2e:"Feb 3",cloud:"low",priority:"Medium",cal:[0,0,0,0,0,0,0,0,0,2,2,1]},
+    {state:"Bihar",zone:"east",crops:"Wheat, Lentil, Mustard, Potato",window:"Jan 10 – Feb 15",s2s:"Jan 8",s2e:"Feb 22",cloud:"low",priority:"High",cal:[0,0,0,0,0,0,0,0,0,1,2,2]},
+    {state:"Chhattisgarh",zone:"central",crops:"Wheat, Chickpea, Lentil",window:"Jan 10 – Feb 15",s2s:"Jan 8",s2e:"Feb 22",cloud:"low",priority:"Medium",cal:[0,0,0,0,0,0,0,0,0,1,2,2]},
+    {state:"Gujarat",zone:"west",crops:"Wheat, Mustard, Chickpea, Cumin",window:"Jan 5 – Feb 10",s2s:"Jan 3",s2e:"Feb 17",cloud:"low",priority:"High",cal:[0,0,0,0,0,0,0,0,1,2,2,1]},
+    {state:"Haryana",zone:"north",crops:"Wheat, Mustard, Chickpea, Barley",window:"Jan 10 – Feb 10",s2s:"Jan 8",s2e:"Feb 22",cloud:"low",priority:"High",cal:[0,0,0,0,0,0,0,0,0,1,2,2]},
+    {state:"Himachal Pradesh",zone:"hilly",crops:"Wheat, Barley, Potato",window:"Jan 15 – Feb 15",s2s:"Jan 13",s2e:"Feb 27",cloud:"medium",priority:"Medium",cal:[0,0,0,0,0,0,0,0,0,1,2,2]},
+    {state:"Jammu & Kashmir",zone:"hilly",crops:"Wheat, Mustard (Jammu plains)",window:"Jan 20 – Feb 20",s2s:"Jan 18",s2e:"Mar 4",cloud:"medium",priority:"Medium",cal:[0,0,0,0,0,0,0,0,0,0,2,2]},
+    {state:"Jharkhand",zone:"east",crops:"Wheat, Lentil, Mustard",window:"Jan 10 – Feb 15",s2s:"Jan 8",s2e:"Feb 22",cloud:"low",priority:"Medium",cal:[0,0,0,0,0,0,0,0,0,1,2,2]},
+    {state:"Karnataka",zone:"south",crops:"Jowar, Sunflower, Chickpea, Wheat",window:"Jan 15 – Feb 20",s2s:"Jan 13",s2e:"Feb 27",cloud:"low",priority:"High",cal:[0,0,0,0,0,0,0,0,0,1,2,2]},
+    {state:"Madhya Pradesh",zone:"central",crops:"Wheat, Chickpea, Mustard, Lentil",window:"Jan 10 – Feb 15",s2s:"Jan 8",s2e:"Feb 22",cloud:"low",priority:"High",cal:[0,0,0,0,0,0,0,0,0,1,2,2]},
+    {state:"Maharashtra",zone:"west",crops:"Wheat, Chickpea, Rabi jowar, Sunflower",window:"Jan 10 – Feb 15",s2s:"Jan 8",s2e:"Feb 22",cloud:"low",priority:"High",cal:[0,0,0,0,0,0,0,0,0,1,2,2]},
+    {state:"Odisha",zone:"east",crops:"Rabi paddy, Mustard, Pulses",window:"Jan 10 – Feb 10",s2s:"Jan 8",s2e:"Feb 22",cloud:"low",priority:"High",cal:[0,0,0,0,0,0,0,0,0,1,2,2]},
+    {state:"Punjab",zone:"north",crops:"Wheat, Mustard, Barley",window:"Jan 10 – Feb 5",s2s:"Jan 8",s2e:"Feb 19",cloud:"low",priority:"High",cal:[0,0,0,0,0,0,0,0,0,1,2,1]},
+    {state:"Rajasthan",zone:"central",crops:"Wheat, Mustard, Chickpea, Barley",window:"Jan 5 – Feb 10",s2s:"Jan 3",s2e:"Feb 17",cloud:"low",priority:"High",cal:[0,0,0,0,0,0,0,0,1,2,2,1]},
+    {state:"Tamil Nadu",zone:"south",crops:"Navarai paddy, Groundnut, Sunflower",window:"Jan 15 – Feb 20",s2s:"Jan 13",s2e:"Feb 27",cloud:"low",priority:"High",cal:[0,0,0,0,0,0,0,0,0,1,2,2]},
+    {state:"Telangana",zone:"south",crops:"Rabi paddy, Sunflower, Jowar, Pulses",window:"Jan 15 – Feb 20",s2s:"Jan 13",s2e:"Feb 27",cloud:"low",priority:"High",cal:[0,0,0,0,0,0,0,0,0,1,2,2]},
+    {state:"Uttar Pradesh",zone:"north",crops:"Wheat, Mustard, Potato, Peas",window:"Jan 5 – Feb 15",s2s:"Jan 3",s2e:"Feb 17",cloud:"low",priority:"High",cal:[0,0,0,0,0,0,0,0,1,2,2,1]},
+    {state:"Uttarakhand",zone:"hilly",crops:"Wheat, Barley, Mustard",window:"Jan 15 – Feb 20",s2s:"Jan 13",s2e:"Feb 27",cloud:"medium",priority:"Medium",cal:[0,0,0,0,0,0,0,0,0,1,2,2]},
+    {state:"West Bengal",zone:"east",crops:"Boro paddy, Potato, Mustard, Lentil",window:"Dec 20 – Jan 25",s2s:"Dec 18",s2e:"Feb 3",cloud:"low",priority:"High",cal:[0,0,0,0,0,0,0,0,0,2,2,1]}
+  ]
+};
+
+const KM=["Jun","Jul","Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar","Apr","May"];
+const RM=["Oct","Nov","Dec","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep"];
+const KC={0:"#1a2810",1:"#2d5c1e",2:"#3fb950"};
+const RC={0:"#0d1a2e",1:"#1a3a6e",2:"#388bfd"};
+const KT={0:"#3a3a2a",1:"#7cbf72",2:"#0d1117"};
+const RT={0:"#1a2233",1:"#79c0ff",2:"#e6edf3"};
+
+let season="kharif";
+
+function setSeason(s){
+  season=s;
+  document.getElementById("btn-kharif").classList.toggle("active",s==="kharif");
+  document.getElementById("btn-rabi").classList.toggle("active",s==="rabi");
+  renderTable();
+}
+
+function calBar(arr,s){
+  const months=s==="kharif"?KM:RM;
+  const bgc=s==="kharif"?KC:RC;
+  const tc=s==="kharif"?KT:RT;
+  let segs=arr.map((v,i)=>`<div class="cal-seg" style="background:${bgc[v]};color:${tc[v]}" title="${months[i]}: ${v===2?'best':v===1?'good':'off'}">${v===2?months[i].charAt(0):""}</div>`).join("");
+  let labels=months.map(m=>`<span>${m.charAt(0)}</span>`).join("");
+  return `<div class="cal-bar">${segs}</div><div class="cal-labels">${labels}</div>`;
+}
+
+function cloudHtml(c){
+  if(c==="high") return `<span class="cloud-hi" style="font-weight:600">&#9650; High</span>`;
+  if(c==="medium") return `<span class="cloud-mid" style="font-weight:600">&#9632; Med</span>`;
+  return `<span class="cloud-lo" style="font-weight:600">&#9660; Low</span>`;
+}
+
+function countPasses(s,e){
+  const d1=new Date(s+", 2025"),d2=new Date(e+", 2025");
+  if(isNaN(d1)||isNaN(d2)) return "~7";
+  const days=Math.round((d2-d1)/(86400000));
+  return "~"+Math.round(days/5);
+}
+
+function renderTable(){
+  const zone=document.getElementById("zoneFilter").value;
+  const cloud=document.getElementById("cloudFilter").value;
+  const q=document.getElementById("searchInput").value.toLowerCase();
+  let rows=DATA[season].filter(r=>{
+    if(zone!=="all"&&r.zone!==zone) return false;
+    if(cloud==="low"&&r.cloud!=="low") return false;
+    if(cloud==="medium"&&r.cloud==="high") return false;
+    if(cloud==="high"&&r.cloud!=="high") return false;
+    if(q&&!r.state.toLowerCase().includes(q)&&!r.crops.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  const zclass={north:"zone-north",south:"zone-south",east:"zone-east",west:"zone-west",central:"zone-central",hilly:"zone-hilly"};
+  document.getElementById("mainTbody").innerHTML=rows.map(r=>`
+    <tr>
+      <td><div class="state-name">${r.state}</div></td>
+      <td><span class="zone-tag ${zclass[r.zone]||''}">${r.zone}</span></td>
+      <td><div class="crop-list">${r.crops}</div></td>
+      <td><div class="window-text">${r.window}</div></td>
+      <td><div class="s2-dates">${r.s2s} → ${r.s2e}</div></td>
+      <td><div class="s2-passes">${countPasses(r.s2s,r.s2e)} passes</div></td>
+      <td>${cloudHtml(r.cloud)}</td>
+      <td><span class="badge ${r.priority==='High'?'badge-best':'badge-med'}">${r.priority}</span></td>
+      <td>${calBar(r.cal,season)}</td>
+    </tr>`).join("");
+}
+renderTable();
+</script>
+</body>
+</html>
